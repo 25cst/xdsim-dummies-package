@@ -754,6 +754,10 @@ struct Slice conn_serialize(Connection conn);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_DATA))
+Data data_default(void);
+#endif
+
+#if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_DATA))
 /**
  * You must not store the pointer to the slice, the slice will be dropped
  * You must malloc for the struct manually

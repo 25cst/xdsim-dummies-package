@@ -41,3 +41,9 @@ Data data_deserialize(struct Slice bytes) {
 }
 
 void data_drop(DataMut data) { free(data); }
+
+Data data_default() {
+    struct Bit *ptr = malloc(sizeof(*ptr));
+    ptr->content = false;
+    return ptr;
+}
