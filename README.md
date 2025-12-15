@@ -1,6 +1,6 @@
 How to implement a package
 1. Go to [xdsim-cbinds](https://github.com/25cst/xdsim-cbinds/)
-2. Copy the xdsim-v0.h C header file to your working directory.
+2. Save the bindgen/c/xdsim-v0.h file to your working directory.
 3. Create a new C file with the following content
    ```c
    // only include one of
