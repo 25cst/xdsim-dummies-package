@@ -47,3 +47,7 @@ Data data_default() {
     ptr->content = false;
     return ptr;
 }
+
+uint32_t schema_version() {
+    return 0;
+}

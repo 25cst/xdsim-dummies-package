@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdlib.h>
 
 #define XDSIM_GATE
@@ -151,3 +152,7 @@ GateMut gate_deserialize(struct Slice bytes) {
 }
 
 void gate_drop(GateMut conn) { free(conn); }
+
+uint32_t schema_version() {
+    return 0;
+}
