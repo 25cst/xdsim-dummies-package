@@ -7,20 +7,6 @@
 #include <stdlib.h>
 
 
-#if (defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE))
-typedef enum ComponentType {
-#if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_GATE))
-    ComponentType_Gate,
-#endif
-#if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
-    ComponentType_Connection,
-#endif
-#if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_DATA))
-    ComponentType_Data,
-#endif
-} ComponentType;
-#endif
-
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && (defined(XDSIM_GATE) || defined(XDSIM_CONN)))
 typedef enum Direction {
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && (defined(XDSIM_GATE) || defined(XDSIM_CONN)))
@@ -74,15 +60,13 @@ typedef enum MenuInputBooleanStyle {
 } MenuInputBooleanStyle;
 #endif
 
-#if (defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE))
 /**
  * A non-resizeable, null-terminated string
  */
 typedef struct Str {
-    const char *first;
+    char *first;
     void (*drop)(char*);
 } Str;
-#endif
 
 #if (defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE))
 typedef struct ComponentIdent {
@@ -92,30 +76,6 @@ typedef struct ComponentIdent {
     uint16_t minor;
     uint16_t patch;
 } ComponentIdent;
-#endif
-
-#if (defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE))
-/**
- * A non-resizeable array with length
- */
-typedef struct Slice {
-    const void *first;
-    uint64_t length;
-    void (*drop)(void*, uint64_t);
-} Slice;
-#endif
-
-#if (defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE))
-typedef struct ComponentHeader {
-    struct ComponentIdent ident;
-    enum ComponentType component_type;
-    /**
-     * [ Str ]
-     */
-    struct Slice authors;
-    struct Str description;
-    struct Str homepage;
-} ComponentHeader;
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
@@ -131,8 +91,21 @@ typedef struct ConnectionDefinition {
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
+typedef const void *Connection;
+#endif
+
+#if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
 typedef void *ConnectionMut;
 #endif
+
+/**
+ * A non-resizeable array with length
+ */
+typedef struct Slice {
+    void *first;
+    uint64_t length;
+    void (*drop)(void*, uint64_t);
+} Slice;
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && (defined(XDSIM_GATE) || defined(XDSIM_CONN)))
 typedef struct Graphic {
@@ -141,10 +114,6 @@ typedef struct Graphic {
      */
     struct Slice elements;
 } Graphic;
-#endif
-
-#if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
-typedef const void *Connection;
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
@@ -717,12 +686,12 @@ typedef struct Element {
 } Element;
 #endif
 
-#if (defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE))
-struct ComponentHeader component_header(void);
+#if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
+extern const struct ConnectionDefinition *conn_def(Connection conn);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
-const struct ConnectionDefinition *conn_def(void);
+extern ConnectionMut conn_default(void);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
@@ -730,27 +699,27 @@ const struct ConnectionDefinition *conn_def(void);
  * You must not store the pointer to the slice, the slice will be dropped
  * You must malloc for the struct manually
  */
-ConnectionMut conn_deserialize(struct Slice bytes);
+extern ConnectionMut conn_deserialize(const struct Slice *bytes);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
-struct Graphic conn_draw(Connection conn, const struct ConnectionDrawRequest *request);
+extern struct Graphic conn_draw(Connection conn, const struct ConnectionDrawRequest *request);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
-void conn_drop(ConnectionMut conn);
+extern void conn_drop(ConnectionMut conn);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
-PropertiesMut conn_props(ConnectionMut conn);
+extern PropertiesMut conn_props(ConnectionMut conn);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_CONN))
-struct Slice conn_serialize(Connection conn);
+extern struct Slice conn_serialize(Connection conn);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_DATA))
-Data data_default(void);
+extern Data data_default(void);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_DATA))
@@ -758,39 +727,46 @@ Data data_default(void);
  * You must not store the pointer to the slice, the slice will be dropped
  * You must malloc for the struct manually
  */
-Data data_deserialize(struct Slice bytes);
+extern Data data_deserialize(const struct Slice *bytes);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_DATA))
-void data_drop(DataMut data);
+extern void data_drop(DataMut data);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_DATA))
-struct Slice data_serialize(Data data);
+extern struct Slice data_serialize(Data data);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_GATE))
-struct GateDefinition gate_def(Gate gate);
+extern struct GateDefinition gate_def(Gate gate);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_GATE))
-GateMut gate_deserialize(struct Slice bytes);
+extern GateMut gate_default(void);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_GATE))
-struct Graphic gate_draw(Gate gate, const struct GateDrawRequest *request);
+extern GateMut gate_deserialize(const struct Slice *bytes);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_GATE))
-void gate_drop(GateMut conn);
+extern struct Graphic gate_draw(Gate gate, const struct GateDrawRequest *request);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_GATE))
-PropertiesMut gate_props(GateMut gate);
+extern void gate_drop(GateMut conn);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_GATE))
-struct Slice gate_serialize(Gate gate);
+/**
+ * Return NULL if no properties
+ */
+extern PropertiesMut gate_props(GateMut gate);
+#endif
+
+#if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_GATE))
+extern struct Slice gate_serialize(Gate gate);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && defined(XDSIM_GATE))
@@ -801,7 +777,7 @@ struct Slice gate_serialize(Gate gate);
  * in this particular case, slice.drop should only drop the slice
  * and not the individual Data
  */
-struct Slice gate_tick(GateMut gate, const struct GateTickRequest *request);
+extern struct Slice gate_tick(GateMut gate, const struct GateTickRequest *request);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && (defined(XDSIM_GATE) || defined(XDSIM_CONN)))
@@ -810,7 +786,7 @@ struct Slice gate_tick(GateMut gate, const struct GateTickRequest *request);
  * You must malloc for the struct manually
  * Return NULL if deserialisation failed
  */
-Properties props_deserialize(struct Slice bytes);
+Properties props_deserialize(const struct Slice *bytes);
 #endif
 
 #if ((defined(XDSIM_CONN) || defined(XDSIM_DATA) || defined(XDSIM_GATE)) && (defined(XDSIM_GATE) || defined(XDSIM_CONN)))

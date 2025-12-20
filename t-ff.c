@@ -14,19 +14,6 @@ struct TFlipFlop {
     bool state;
 };
 
-struct ComponentHeader component_header(void) {
-    return (struct ComponentHeader){
-        .ident = {.package = {.first = "dummies", .drop = noop_drop},
-                  .component = {.first = "dummy-t-ff", .drop = noop_drop},
-                  .major = 0,
-                  .minor = 1,
-                  .patch = 0},
-        .component_type = ComponentType_Gate,
-        .description = {.first = "A dummy T flip-flop.", .drop = noop_drop},
-        .homepage = {.first = "https://github.com/25cst/xdsim-dummies-v0",
-                     .drop = noop_drop}};
-}
-
 Slice gate_tick(GateMut gate, const struct GateTickRequest *request) {
     bool t = *(bool *)request->inputs.first;
     struct TFlipFlop *self = (struct TFlipFlop *)gate;
@@ -145,14 +132,12 @@ Slice gate_serialize(Gate gate) {
     return (Slice){.first = ptr, .length = 1, .drop = drop_single};
 }
 
-GateMut gate_deserialize(struct Slice bytes) {
+GateMut gate_deserialize(const struct Slice *bytes) {
     struct TFlipFlop *ptr = malloc(sizeof(*ptr));
-    ptr->state = *((uint8_t *)bytes.first);
+    ptr->state = *((uint8_t *)bytes->first);
     return ptr;
 }
 
-void gate_drop(GateMut conn) { free(conn); }
+void gate_drop(GateMut gate) { free(gate); }
 
-uint32_t schema_version() {
-    return 0;
-}
+uint32_t schema_version() { return 0; }
