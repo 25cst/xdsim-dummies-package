@@ -14,8 +14,8 @@ struct TFlipFlop {
     bool state;
 };
 
-Slice gate_tick(GateMut gate, const struct GateTickRequest *request) {
-    bool t = *(bool *)request->inputs.first;
+Slice gate_tick(GateMut gate, struct Slice inputs) {
+    bool t = *(bool *)inputs.first;
     struct TFlipFlop *self = (struct TFlipFlop *)gate;
 
     if (t)
@@ -34,7 +34,7 @@ Slice gate_tick(GateMut gate, const struct GateTickRequest *request) {
     return (Slice){.first = outputs, .length = 2, .drop = drop_single};
 }
 
-Graphic gate_draw(Gate gate, const struct GateDrawRequest *request) {
+Graphic gate_draw(Gate gate, Direction direction, Vec2 bounding_box) {
     Element *elements = malloc(sizeof(*elements) * 2);
 
     // outline
